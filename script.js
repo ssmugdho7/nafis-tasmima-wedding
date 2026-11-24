@@ -170,10 +170,29 @@
   var menuBtn = $('menuBtn'), drawer = $('drawer'), backdrop = $('drawerBackdrop'), drawerClose = $('drawerClose');
   var drawerOpen = false;
 
+  var footerEl = doc.querySelector('.site-footer');
+  var lastY = window.scrollY || 0, toTopIdle = 0;
   function onScroll() {
     var y = window.scrollY || window.pageYOffset;
+    var vh = window.innerHeight;
     header.classList.toggle('scrolled', y > 24);
-    toTop.classList.toggle('show', y > window.innerHeight * 0.9);
+    // Show only after a real scroll (2 screens), never once the footer (which has its own
+    // "Back to Top" button) is in view. On phones the text runs to the edge, so the button
+    // only appears while the reader scrolls back up, then tucks away after a short pause —
+    // it never rests on top of text during normal reading.
+    var nearFooter = footerEl && footerEl.getBoundingClientRect().top < vh - 40;
+    var eligible = y > vh * 2 && !nearFooter;
+    var narrow = window.innerWidth < 600;
+    var show = eligible && (!narrow || y < lastY - 2 || (toTop.classList.contains('show') && y <= lastY));
+    if (narrow && toTop.contains(doc.activeElement)) show = eligible;   // keep it while focused
+    toTop.classList.toggle('show', show);
+    lastY = y;
+    clearTimeout(toTopIdle);
+    if (narrow && show) {
+      toTopIdle = setTimeout(function () {
+        if (!toTop.contains(doc.activeElement)) toTop.classList.remove('show');
+      }, 2200);
+    }
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
@@ -520,7 +539,7 @@
     var list = storeGet('localStorage', STORE.wishes, []);
     return Array.isArray(list) ? list : [];
   }
-  function saveWishes(list) { storeSet('localStorage', STORE.wishes, list.slice(0, 200)); }
+  function saveWishes(list) { return storeSet('localStorage', STORE.wishes, list.slice(0, 200)); }
   function upsertWish(w) {
     var list = getWishes();
     var id = w.id || ('w' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6));
@@ -529,7 +548,10 @@
     for (var i = 0; i < list.length; i++) if (list[i].id === id) idx = i;
     if (idx >= 0) list.splice(idx, 1);
     list.unshift(item);
-    saveWishes(list);
+    if (!saveWishes(list)) {
+      showToast('Sorry \u2014 your wish couldn\u2019t be saved on this device');
+      return null;
+    }
     renderWishes();
     return id;
   }
@@ -565,7 +587,7 @@
     var okN = setError(wName, $('wNameErr'), n ? '' : 'Please enter your name.');
     var okM = setError(wMsg, $('wMsgErr'), m.length >= 2 ? '' : 'Please write a short wish or dua.');
     if (!okN || !okM) { (okN ? wMsg : wName).focus(); return; }
-    upsertWish({ name: n, message: m });
+    if (!upsertWish({ name: n, message: m })) return;   // keep the text so nothing is lost
     wishForm.reset();
     showToast('JazakAllahu khairan for your dua');
   });
@@ -575,6 +597,11 @@
     });
   });
   renderWishes();
+  $('writeWish').addEventListener('click', function (e) {
+    e.preventDefault();
+    wishForm.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+    try { wName.focus({ preventScroll: true }); } catch (err) { wName.focus(); }
+  });
   window.addEventListener('storage', function (e) { if (e.key === STORE.wishes) renderWishes(); });
 
   /* ---------------- map: tap to load ---------------- */
@@ -699,10 +726,10 @@
     }
     // A gentle welcome, not a screensaver: the particles run while the hero is on screen,
     // for at most PARTICLE_BUDGET ms of visible time, then fade out and stop for good.
-    var PARTICLE_BUDGET = 15000;
-    var used = 0, runStart = 0, heroVisible = true, done = false, fadeTimer = 0;
+    var PARTICLE_BUDGET = window.innerWidth < 640 ? 10000 : 15000;
+    var used = 0, runStart = 0, heroVisible = true, done = false, fadeTimer = 0, typing = false;
     function play() {
-      if (rafId || done || doc.hidden || !heroVisible) return;
+      if (rafId || done || doc.hidden || !heroVisible || typing) return;
       clearTimeout(fadeTimer);
       canvas.classList.remove('fade');
       last = runStart = performance.now();
@@ -725,6 +752,13 @@
       if (total >= PARTICLE_BUDGET) finish();
     }, 1000);
     doc.addEventListener('visibilitychange', function () { if (doc.hidden) pause(false); else play(); });
+    // keep typing smooth: no animation frames while a form field has focus
+    function isField(el) { return el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName); }
+    doc.addEventListener('focusin', function (e) { if (isField(e.target)) { typing = true; pause(false); } });
+    doc.addEventListener('focusout', function (e) {
+      if (!isField(e.target)) return;
+      setTimeout(function () { typing = isField(doc.activeElement); if (!typing) play(); }, 0);
+    });
     var hero = $('home');
     if (hero && 'IntersectionObserver' in window) {
       new IntersectionObserver(function (entries) {

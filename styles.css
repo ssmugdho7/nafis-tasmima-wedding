@@ -154,14 +154,22 @@ html.js .reveal.revealed { opacity: 1; transform: none; }
   font-size: clamp(.7rem, 1.6vw, .78rem); letter-spacing: .18em; text-transform: uppercase;
   color: var(--ink-soft); margin-bottom: 10px;
 }
-.section { position: relative; padding: clamp(52px, 7vw, 80px) 0; }
+.section { position: relative; padding: clamp(44px, 5vw, 64px) 0; }
+/* a small gold sprig marks the seam between consecutive sections */
+.section + .section::before {
+  content: ''; position: absolute; top: 0; left: 50%; width: 120px; height: 14px; transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle, var(--blush) 0 3px, transparent 3.5px) center / 14px 14px no-repeat,
+    linear-gradient(90deg, transparent, rgba(197,160,89,.6) 30%, transparent 45%, transparent 55%, rgba(197,160,89,.6) 70%, transparent) center / 100% 1px no-repeat;
+  pointer-events: none;
+}
 /* 8. anchor targets clear the sticky header */
-section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
+section[id], .rsvp-card, .wish-form { scroll-margin-top: calc(var(--header-h) + 12px); }
 .section-panel {
   background:
     linear-gradient(180deg, rgba(243,232,218,.0), rgba(243,232,218,.65) 14%, rgba(243,232,218,.65) 86%, rgba(243,232,218,0));
 }
-.section-head { text-align: center; margin: 0 auto clamp(24px, 3.4vw, 40px); max-width: 720px; }
+.section-head { text-align: center; margin: 0 auto clamp(22px, 3vw, 34px); max-width: 720px; }
 .section-title {
   font-family: var(--f-serif); font-weight: 600;
   font-size: clamp(1.9rem, 4.2vw, 2.9rem); line-height: 1.15; color: var(--ink);
@@ -234,11 +242,12 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
 }
 .brand-text { font-family: var(--f-script); font-size: 1.6rem; color: var(--rosewood); line-height: 1; white-space: nowrap; }
 .brand-amp { color: var(--gold-deep); }
-@media (max-width: 379px) { .brand-text { font-size: 1.32rem; } .brand { gap: 8px; } .brand-seal { width: 40px; height: 40px; } }
+@media (max-width: 379px) { .brand-text { font-size: 1.32rem; } .brand { gap: 8px; } }
+.brand { min-height: 44px; }
 
 .nav-links { display: none; list-style: none; margin: 0; padding: 0; align-items: center; gap: 2px; }
 .nav-links a {
-  position: relative; display: inline-block; padding: 10px 12px;
+  position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 10px 12px;
   font-family: var(--f-sans); font-size: .78rem; letter-spacing: .12em; text-transform: uppercase;
   color: var(--ink-soft); text-decoration: none; transition: color .2s;
 }
@@ -358,17 +367,33 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
 @keyframes gentleFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @media (prefers-reduced-motion: reduce) { .couple-img { animation: none; } }
 
-.scroll-cue {
-  display: none; margin: 4px auto 0; width: 26px; height: 42px; border: 1.5px solid var(--gold); border-radius: 14px; position: relative;
+.scroll-cue {   /* 44x48 hit area around a 26x42 mouse outline */
+  display: none; margin: 2px auto 0; width: 44px; height: 48px; position: relative; border-radius: 14px;
 }
+.scroll-cue::before { content: ''; position: absolute; left: 9px; top: 3px; width: 26px; height: 42px; border: 1.5px solid var(--gold); border-radius: 14px; box-sizing: border-box; }
 .scroll-cue span {
-  position: absolute; left: 50%; top: 8px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: var(--gold);
+  position: absolute; left: 50%; top: 11px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px; background: var(--gold);
   animation: cue 1.8s ease-in-out infinite;
   animation-play-state: var(--play, paused);
 }
 @keyframes cue { 0% { opacity: 0; transform: translateY(0); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(12px); } }
 @media (prefers-reduced-motion: reduce) { .scroll-cue span { animation: none; } }
 
+@media (max-width: 599px) {
+  .hero .garland-top { height: 42px; margin-bottom: 0; }
+  .bismillah-wrap { padding-top: 0; }
+  .hero .bismillah { font-size: 1.55rem; line-height: 1.5; }
+  .bismillah-rule { margin-top: 2px; }
+  .bismillah-meaning { margin-top: 4px; font-size: .95rem; line-height: 1.4; }
+  .hero-grid { margin-top: 12px; gap: 0; }
+  .hero-copy .eyebrow { margin-bottom: 2px; }
+  .hero-names { font-size: clamp(3.1rem, 14vw, 3.7rem); line-height: .98; }
+  .hero .divider { margin: 8px auto; }
+  .hero-venue { margin-top: 6px; font-size: 1.1rem; }
+  .hero-ctas { margin-top: 16px; }
+  .hero-countdown { margin-top: 10px; }
+  .hero-art { margin-top: 2px; }
+}
 @media (max-width: 379px) {
   .hero .garland-top { height: 40px; margin-bottom: 0; }
   .bismillah-wrap { padding-top: 0; }
@@ -381,6 +406,13 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
   .hero-venue { margin-top: 6px; font-size: 1.08rem; }
   .hero-ctas { margin-top: 16px; gap: 10px; }
   .hero-ctas .btn { padding: 12px 18px; }
+}
+@media (min-width: 600px) and (max-width: 899px) {
+  .hero-names { font-size: clamp(4.4rem, 10vw, 5.4rem); }
+  .hero-date { font-size: .9rem; }
+  .hero-venue { font-size: 1.3rem; }
+  .hero-ctas .btn { min-height: 50px; padding: 14px 28px; font-size: .84rem; }
+  .hero-art { width: min(100%, 440px); }
 }
 @media (min-width: 900px) {
   .hero { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; }
@@ -398,13 +430,15 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
   position: relative; overflow: hidden; text-align: center;
   display: flex; flex-direction: column; justify-content: flex-start;
   background: var(--card); border: 1px solid var(--gold-light); border-radius: var(--radius);
-  padding: clamp(52px, 6vw, 64px) clamp(20px, 3vw, 34px);
+  /* vertical padding >= corner size, so the corner sprays sit above / below the text block */
+  padding: calc(var(--corner) + 6px) clamp(18px, 3vw, 30px);
   box-shadow: var(--shadow);
 }
 .person-card::before {
   content: ''; position: absolute; inset: 8px; border: 1px solid rgba(197,160,89,.35); border-radius: calc(var(--radius) - 6px); pointer-events: none;
 }
-.card-corner { position: absolute; width: clamp(56px, 12vw, 104px); pointer-events: none; opacity: .9; }
+.card-corner { position: absolute; width: var(--corner, 64px); pointer-events: none; opacity: .9; }
+.person-card { --corner: clamp(52px, 7vw, 72px); }
 .card-corner svg { display: block; width: 100%; height: auto; }
 .cc-tl { top: 0; left: 0; }
 .cc-tr { top: 0; right: 0; transform: scaleX(-1); }
@@ -456,7 +490,7 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
   font-style: italic; font-weight: 500; font-size: clamp(1.2rem, 2.3vw, 1.4rem); line-height: 1.6; color: var(--msg-ink); max-width: 32ch;
 }
 .quran-quote { margin: 0; }
-.quran-quote p { font-size: clamp(1.4rem, 2.8vw, 1.75rem); }
+.quran-quote p { font-size: clamp(1.3rem, 2.5vw, 1.6rem); }
 .quran-ref { font-family: var(--f-sans); font-size: .76rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-text); font-weight: 600; }
 .with-love { margin-top: clamp(24px, 3vw, 36px); text-align: center; font-style: italic; font-size: clamp(1.2rem, 2.4vw, 1.45rem); color: var(--msg-ink); }
 .with-love-names { display: inline-block; margin-top: 4px; font-style: normal; font-family: var(--f-script); font-size: clamp(2.2rem, 4.6vw, 3rem); color: var(--rosewood); line-height: 1.2; }
@@ -501,6 +535,9 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
 @media (max-width: 559px) { .detail-text .br-wide { display: none; } }
 .details-card .actions { justify-content: flex-start; }
 .actions-cal { padding-top: 18px; margin-top: 18px; border-top: 1px dashed rgba(197,160,89,.5); }
+@media (min-width: 481px) and (max-width: 899px) {
+  .details-card .actions .btn { flex: 1 1 0; min-height: 50px; font-size: .82rem; }
+}
 
 .map-col { display: flex; flex-direction: column; gap: 14px; }
 .map-frame {
@@ -624,7 +661,7 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
 }
 .field legend { margin-bottom: 8px; }
 .req { color: var(--rosewood); }
-.optional { text-transform: none; letter-spacing: 0; color: var(--ink-soft); font-weight: 400; }
+.optional { text-transform: none; letter-spacing: 0; color: var(--ink-soft); font-weight: 400; white-space: nowrap; }
 .field input[type="text"], .field input[type="tel"], .field input[type="number"], .field textarea {
   width: 100%; min-height: 48px; margin: 0; padding: 12px 14px; display: block;
   font-family: var(--f-sans); font-size: 1rem; color: var(--ink);
@@ -689,7 +726,7 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
 
 @media (min-width: 900px) {
   .rsvp-layout { grid-template-columns: .85fr 1.15fr; gap: clamp(30px, 5vw, 64px); align-items: start; }
-  .rsvp-aside { text-align: left; position: sticky; top: calc(var(--header-h) + 48px); padding-top: 24px; }
+  .rsvp-aside { text-align: left; position: sticky; top: 100px; padding-top: 24px; }
   .rsvp-intro { margin-inline: 0; }
 }
 
@@ -725,7 +762,16 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
 .wish-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(197,160,89,.3); }
 .wish-name { font-family: var(--f-sans); font-weight: 600; font-size: .82rem; letter-spacing: .08em; text-transform: uppercase; color: var(--rosewood); }
 .wish-date { font-family: var(--f-sans); font-size: .78rem; color: var(--ink-soft); }
-.wish-empty { text-align: center; margin-top: 28px; font-style: italic; font-size: 1.2rem; color: var(--ink-soft); }
+.wish-empty {
+  position: relative; overflow: hidden; max-width: 620px; margin: clamp(24px, 3.4vw, 36px) auto 0; text-align: center;
+  background: var(--card); border: 1px dashed rgba(197,160,89,.7); border-radius: var(--radius);
+  padding: 74px clamp(20px, 5vw, 56px); box-shadow: var(--shadow);
+  --corner: 64px;
+}
+.wish-empty .card-corner { opacity: .75; }
+.wish-empty-icon { width: 34px; height: 34px; color: var(--blush-deep); margin: 0 auto 8px; display: block; }
+.wish-empty-title { font-family: var(--f-script); font-size: clamp(1.9rem, 4vw, 2.4rem); color: var(--rosewood); line-height: 1.2; }
+.wish-empty-text { margin: 8px auto 18px; max-width: 38ch; font-style: italic; font-size: 1.18rem; color: var(--msg-ink); text-wrap: pretty; }
 
 /* =====================================================================
    FOOTER
@@ -746,13 +792,16 @@ section[id], .rsvp-card { scroll-margin-top: calc(var(--header-h) + 12px); }
 
 .to-top {
   position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 55;
-  width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--gold); cursor: pointer;
+  width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gold); cursor: pointer;
   background: rgba(255,253,250,.92); color: var(--gold-text); box-shadow: 0 10px 24px -14px rgba(58,42,34,.6);
   display: inline-flex; align-items: center; justify-content: center;
   opacity: 0; visibility: hidden; transform: translateY(10px);
   transition: opacity .3s, transform .3s var(--ease), visibility .3s, background .2s, color .2s;
 }
-.to-top svg { width: 20px; height: 20px; }
+.to-top svg { width: 18px; height: 18px; }
+@media (max-width: 599px) {
+  .to-top { width: 40px; height: 40px; right: max(4px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+}
 .to-top.show { opacity: 1; visibility: visible; transform: none; }
 .to-top:hover, .to-top:focus-visible { background: var(--gold-text); color: var(--card); }
 
@@ -858,7 +907,8 @@ html.intro-on .overlay { display: flex; }
   animation: pulseLabel 2.2s ease-in-out infinite;
 }
 @keyframes pulseLabel { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
-.overlay.opening .scene-btn > span:not(.scene), .overlay.opening .skip-intro { opacity: 0; transition: opacity .4s ease; }
+.scene-btn > span:not(.scene), .skip-intro { transition: opacity .3s ease; }
+.overlay.opening .scene-btn > span:not(.scene), .overlay.opening .skip-intro { opacity: 0; }
 .skip-intro {
   position: absolute; z-index: 3; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px));
   appearance: none; border: 1px solid rgba(197,160,89,.7); background: rgba(255,253,250,.8); border-radius: 999px;
